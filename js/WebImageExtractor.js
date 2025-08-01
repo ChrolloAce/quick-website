@@ -6,8 +6,8 @@ window.WebImageExtractor = class WebImageExtractor {
     constructor() {
         this.corsProxies = [
             'https://api.allorigins.win/raw?url=',
-            'https://cors-anywhere.herokuapp.com/',
-            'https://proxy.cors.sh/'
+            'https://corsproxy.io/?',
+            'https://cors-proxy.htmldriven.com/?url='
         ];
         this.currentProxyIndex = 0;
         this.listeners = {};
@@ -301,14 +301,15 @@ window.WebImageExtractor = class WebImageExtractor {
      */
     async createImageData(imageInfo, baseUrl) {
         try {
-            const response = await fetch(imageInfo.src);
+            // Try to fetch image using CORS proxy
+            const response = await this.fetchImageWithProxy(imageInfo.src);
             if (!response.ok) return null;
             
             const blob = await response.blob();
             if (!blob.type.startsWith('image/')) return null;
             
             // Skip very small images (likely icons)
-            if (blob.size < 1024) return null;
+            if (blob.size < 2048) return null; // Increased threshold
             
             const dataUrl = await this.blobToDataUrl(blob);
             
@@ -327,6 +328,47 @@ window.WebImageExtractor = class WebImageExtractor {
             console.warn('Failed to create image data:', error);
             return null;
         }
+    }
+
+    /**
+     * Fetch image with CORS proxy
+     */
+    async fetchImageWithProxy(imageUrl) {
+        // First try direct fetch (some images allow CORS)
+        try {
+            const response = await fetch(imageUrl, { mode: 'cors' });
+            if (response.ok) {
+                return response;
+            }
+        } catch (error) {
+            // Continue to proxy attempts
+        }
+
+        // Try with CORS proxies
+        for (let i = 0; i < this.corsProxies.length; i++) {
+            const proxyIndex = (this.currentProxyIndex + i) % this.corsProxies.length;
+            const proxy = this.corsProxies[proxyIndex];
+            
+            try {
+                const response = await fetch(proxy + encodeURIComponent(imageUrl), {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (compatible; ImageExtractor/1.0)'
+                    }
+                });
+                
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.startsWith('image/')) {
+                        return response;
+                    }
+                }
+            } catch (error) {
+                console.warn(`Proxy ${proxy} failed for image:`, error.message);
+                continue;
+            }
+        }
+        
+        throw new Error('All proxy attempts failed for image');
     }
 
     /**
