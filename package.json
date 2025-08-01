@@ -7,7 +7,7 @@
     "start": "npx live-server --port=3000 --open",
     "dev": "npx live-server --port=3000 --open --watch=.",
     "serve": "npx http-server -p 3000 -o",
-    "build": "echo 'Build completed - static files ready for deployment'",
+    "build": "mkdir -p public && cp -r *.html *.css *.json js public/",
     "preview": "npx live-server --port=3000",
     "test": "echo 'No tests specified'"
   },

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "functions": {},
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "outputDirectory": ".",
+  "buildCommand": "echo 'No build required - static files ready'",
+  "devCommand": "python3 -m http.server 3000",
+  "installCommand": "echo 'No install required'",
+  "framework": null
+}
