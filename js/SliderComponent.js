@@ -51,14 +51,17 @@ window.SliderComponent = class SliderComponent {
      * Build slider HTML structure
      */
     buildSliderHTML() {
+        this.totalPages = Math.ceil(this.images.length / 9); // 9 images per page (3x3)
+        this.currentPage = 0;
+        
         this.container.innerHTML = `
             <div class="slider-container" data-slider>
                 <div class="slider-wrapper">
-                    <div class="slider-track grid-view" data-track>
-                        ${this.buildSlidesHTML()}
+                    <div class="slider-track" data-track>
+                        ${this.buildCurrentPageHTML()}
                     </div>
-                    ${this.options.showNavigation ? this.buildNavigationHTML() : ''}
-                    ${this.options.showIndicators ? this.buildIndicatorsHTML() : ''}
+                    ${this.options.showNavigation && this.totalPages > 1 ? this.buildNavigationHTML() : ''}
+                    ${this.options.showIndicators && this.totalPages > 1 ? this.buildPageIndicatorsHTML() : ''}
                 </div>
             </div>
             <div class="lightbox" data-lightbox>
@@ -71,14 +74,31 @@ window.SliderComponent = class SliderComponent {
     }
 
     /**
-     * Build slides HTML
+     * Build current page HTML (3x3 grid)
      */
-    buildSlidesHTML() {
-        return this.images.map((image, index) => `
-            <div class="slider-slide compact" data-slide="${index}" data-lightbox-trigger>
+    buildCurrentPageHTML() {
+        const startIndex = this.currentPage * 9;
+        const endIndex = Math.min(startIndex + 9, this.images.length);
+        const pageImages = this.images.slice(startIndex, endIndex);
+        
+        return pageImages.map((image, index) => `
+            <div class="slider-slide cube-item" data-slide="${startIndex + index}" data-lightbox-trigger>
                 <img src="${image.src}" alt="${image.name}" loading="lazy">
             </div>
         `).join('');
+    }
+
+    /**
+     * Build page indicators HTML
+     */
+    buildPageIndicatorsHTML() {
+        const indicators = Array.from({ length: this.totalPages }, (_, index) => 
+            `<button class="slider-indicator ${index === 0 ? 'active' : ''}" 
+                    data-page="${index}" 
+                    aria-label="Go to page ${index + 1}"></button>`
+        ).join('');
+
+        return `<div class="slider-indicators">${indicators}</div>`;
     }
 
     /**
@@ -96,16 +116,83 @@ window.SliderComponent = class SliderComponent {
     }
 
     /**
-     * Build indicators HTML
+     * Navigate to next page (9 images)
      */
-    buildIndicatorsHTML() {
-        const indicators = this.images.map((_, index) => 
-            `<button class="slider-indicator ${index === 0 ? 'active' : ''}" 
-                    data-indicator="${index}" 
-                    aria-label="Go to slide ${index + 1}"></button>`
-        ).join('');
+    nextPage() {
+        if (this.currentPage < this.totalPages - 1) {
+            this.currentPage++;
+            this.updatePage();
+        }
+    }
 
-        return `<div class="slider-indicators">${indicators}</div>`;
+    /**
+     * Navigate to previous page (9 images)
+     */
+    previousPage() {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            this.updatePage();
+        }
+    }
+
+    /**
+     * Go to specific page
+     */
+    goToPage(pageIndex) {
+        if (pageIndex >= 0 && pageIndex < this.totalPages && pageIndex !== this.currentPage) {
+            this.currentPage = pageIndex;
+            this.updatePage();
+        }
+    }
+
+    /**
+     * Update page content with smooth transition
+     */
+    updatePage() {
+        const track = this.track;
+        
+        // Add transition class
+        track.classList.add('paginating');
+        
+        setTimeout(() => {
+            // Update content
+            track.innerHTML = this.buildCurrentPageHTML();
+            
+            // Re-bind lightbox events for new images
+            this.bindLightboxEventsForCurrentPage();
+            
+            // Update indicators
+            this.updatePageIndicators();
+            
+            // Remove transition class
+            track.classList.remove('paginating');
+            
+            // Update navigation button states
+            this.updateNavigationStates();
+            
+        }, 200);
+    }
+
+    /**
+     * Update page indicators
+     */
+    updatePageIndicators() {
+        const indicators = this.container.querySelectorAll('[data-page]');
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === this.currentPage);
+        });
+    }
+
+    /**
+     * Update navigation button states
+     */
+    updateNavigationStates() {
+        if (this.prevBtn) {
+            this.prevBtn.classList.toggle('disabled', this.currentPage === 0);
+        }
+        if (this.nextBtn) {
+            this.nextBtn.classList.toggle('disabled', this.currentPage === this.totalPages - 1);
+        }
     }
 
     /**
@@ -114,30 +201,32 @@ window.SliderComponent = class SliderComponent {
     initializeElements() {
         this.sliderElement = this.container.querySelector('[data-slider]');
         this.track = this.container.querySelector('[data-track]');
-        this.slides = this.container.querySelectorAll('[data-slide]');
         this.prevBtn = this.container.querySelector('[data-nav="prev"]');
         this.nextBtn = this.container.querySelector('[data-nav="next"]');
-        this.indicators = this.container.querySelectorAll('[data-indicator]');
         this.lightbox = this.container.querySelector('[data-lightbox]');
         this.lightboxImg = this.container.querySelector('[data-lightbox-img]');
         this.lightboxClose = this.container.querySelector('[data-lightbox-close]');
+        
+        // Update navigation states
+        this.updateNavigationStates();
     }
 
     /**
      * Bind event listeners
      */
     bindEvents() {
-        // Navigation buttons
+        // Navigation buttons (now for pages)
         if (this.prevBtn) {
-            this.prevBtn.addEventListener('click', () => this.previousSlide());
+            this.prevBtn.addEventListener('click', () => this.previousPage());
         }
         if (this.nextBtn) {
-            this.nextBtn.addEventListener('click', () => this.nextSlide());
+            this.nextBtn.addEventListener('click', () => this.nextPage());
         }
 
-        // Indicators
-        this.indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => this.goToSlide(index));
+        // Page indicators
+        const pageIndicators = this.container.querySelectorAll('[data-page]');
+        pageIndicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => this.goToPage(index));
         });
 
         // Keyboard navigation
@@ -162,9 +251,17 @@ window.SliderComponent = class SliderComponent {
      * Bind lightbox events
      */
     bindLightboxEvents() {
-        // Click on images to open lightbox
-        this.slides.forEach((slide, index) => {
-            slide.addEventListener('click', () => this.openLightbox(index));
+        this.bindLightboxEventsForCurrentPage();
+    }
+
+    /**
+     * Bind lightbox events for current page images
+     */
+    bindLightboxEventsForCurrentPage() {
+        const currentSlides = this.container.querySelectorAll('[data-slide]');
+        currentSlides.forEach((slide) => {
+            const slideIndex = parseInt(slide.getAttribute('data-slide'));
+            slide.addEventListener('click', () => this.openLightbox(slideIndex));
         });
         
         // Close lightbox events
@@ -331,21 +428,14 @@ window.SliderComponent = class SliderComponent {
     }
 
     /**
-     * Update slider position and indicators
+     * Update images and rebuild grid
      */
-    updateSlider() {
-        const translateX = -this.currentSlide * 100;
-        this.track.style.transform = `translateX(${translateX}%)`;
-
-        // Update indicators
-        this.indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === this.currentSlide);
-        });
-
-        // Update navigation button states
-        if (this.prevBtn && this.nextBtn) {
-            this.prevBtn.style.opacity = this.images.length <= 1 ? '0.5' : '1';
-            this.nextBtn.style.opacity = this.images.length <= 1 ? '0.5' : '1';
+    updateImages(images) {
+        this.images = images;
+        this.currentPage = 0;
+        
+        if (this.container) {
+            this.render(this.container);
         }
     }
 

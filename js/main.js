@@ -73,6 +73,7 @@ function checkDependencies() {
         'SliderComponent', 
         'EmbedCodeGenerator',
         'WebImageExtractor',
+        'ProjectManager',
         'PreviewManager',
         'AppController'
     ];

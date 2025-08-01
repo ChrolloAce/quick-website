@@ -4,13 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slider Embed Generator</title>
-    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
     <div class="container">
         <header class="header">
             <h1>Image Slider Generator</h1>
             <p>Upload images and generate embeddable slider code for any website</p>
+            
+            <!-- Project Management -->
+            <div class="project-manager">
+                <div class="project-controls">
+                    <select id="projectSelect" class="project-select">
+                        <option value="">+ New Project</option>
+                    </select>
+                    <button id="saveProjectBtn" class="btn btn-save" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                            <polyline points="7,3 7,8 15,8"></polyline>
+                        </svg>
+                        Save Project
+                    </button>
+                    <button id="deleteProjectBtn" class="btn btn-delete" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+                <div class="project-info">
+                    <input type="text" id="projectName" placeholder="Enter project name..." class="project-name-input">
+                    <div class="project-status">
+                        <span class="project-id" id="projectId"></span>
+                        <span class="project-embed-count" id="embedCount">0 embeds active</span>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main class="main">
@@ -125,12 +156,13 @@
         </main>
     </div>
 
-    <script src="js/ImageUploadManager.js?v=5"></script>
-    <script src="js/SliderComponent.js?v=5"></script>
-    <script src="js/EmbedCodeGenerator.js?v=5"></script>
-    <script src="js/WebImageExtractor.js?v=5"></script>
-    <script src="js/PreviewManager.js?v=5"></script>
-    <script src="js/AppController.js?v=5"></script>
-    <script src="js/main.js?v=5"></script>
+    <script src="js/ImageUploadManager.js?v=6"></script>
+    <script src="js/SliderComponent.js?v=6"></script>
+    <script src="js/EmbedCodeGenerator.js?v=6"></script>
+    <script src="js/WebImageExtractor.js?v=6"></script>
+    <script src="js/ProjectManager.js?v=6"></script>
+    <script src="js/PreviewManager.js?v=6"></script>
+    <script src="js/AppController.js?v=6"></script>
+    <script src="js/main.js?v=6"></script>
 </body>
 </html> 

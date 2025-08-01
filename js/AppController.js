@@ -34,6 +34,9 @@ window.AppController = class AppController {
      * Initialize all components
      */
     async initializeComponents() {
+        // Initialize project manager
+        this.projectManager = new ProjectManager();
+        
         // Initialize image upload manager
         this.imageUploadManager = new ImageUploadManager();
         
@@ -54,6 +57,15 @@ window.AppController = class AppController {
      * Set up component communication
      */
     setupComponentCommunication() {
+        // Listen to project manager events
+        this.projectManager.on('projectLoaded', (project) => {
+            this.handleProjectLoaded(project);
+        });
+
+        this.projectManager.on('projectCreated', (project) => {
+            this.handleProjectCreated(project);
+        });
+
         // Listen to image upload events
         this.imageUploadManager.on('imagesUpdated', (images) => {
             this.handleImagesUpdated(images);
@@ -153,10 +165,49 @@ window.AppController = class AppController {
     }
 
     /**
+     * Handle project loaded event
+     */
+    handleProjectLoaded(project) {
+        // Clear current images
+        this.imageUploadManager.clearImages();
+        
+        // Load project images
+        if (project.images && project.images.length > 0) {
+            project.images.forEach(image => {
+                this.imageUploadManager.addImage(image);
+            });
+            
+            this.imageUploadManager.renderImages();
+            this.currentImages = project.images;
+            this.previewManager.updatePreview(project.images);
+            this.updateAppState('preview');
+        } else {
+            this.currentImages = [];
+            this.previewManager.hidePreview();
+            this.hideEmbedSection();
+            this.updateAppState('upload');
+        }
+    }
+
+    /**
+     * Handle project created event
+     */
+    handleProjectCreated(project) {
+        this.currentImages = [];
+        this.imageUploadManager.clearImages();
+        this.previewManager.hidePreview();
+        this.hideEmbedSection();
+        this.updateAppState('upload');
+    }
+
+    /**
      * Handle images updated event
      */
     handleImagesUpdated(images) {
         this.currentImages = images;
+        
+        // Update current project with new images
+        this.projectManager.updateProjectImages(images);
         
         if (images.length > 0) {
             this.previewManager.updatePreview(images);
@@ -209,26 +260,27 @@ window.AppController = class AppController {
         }
 
         try {
-            const embedCode = this.embedCodeGenerator.generateEmbedCode(this.currentImages, {
-                autoPlay: true,
-                autoPlayDelay: 4000,
-                showIndicators: true,
-                showNavigation: true,
-                enableKeyboard: true,
-                enableTouch: true
-            });
+            const currentProject = this.projectManager.getCurrentProject();
+            
+            if (!currentProject) {
+                this.showError('Please save your project first to generate embed code');
+                return;
+            }
+            
+            const embedCode = this.projectManager.generateDynamicEmbedCode();
 
             this.displayEmbedCode(embedCode);
             this.showEmbedSection();
             this.updateAppState('embed');
             
             this.trackEvent('embed_code_generated', {
+                project_id: currentProject.id,
                 image_count: this.currentImages.length,
                 code_length: embedCode.length
             });
         } catch (error) {
             console.error('Error generating embed code:', error);
-            this.showError('Failed to generate embed code');
+            this.showError('Failed to generate embed code: ' + error.message);
         }
     }
 

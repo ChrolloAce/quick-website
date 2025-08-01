@@ -37,6 +37,123 @@ body {
     font-size: 1.2rem;
     opacity: 0.9;
     font-weight: 300;
+    margin-bottom: 2rem;
+}
+
+/* Project Management Styles */
+.project-manager {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.project-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.project-select {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.project-select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.8);
+    background: white;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+    background: linear-gradient(135deg, #218838, #1ca87d);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(40, 167, 69, 0.4);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #dc3545, #e91e63);
+    color: white;
+}
+
+.btn-delete:hover:not(:disabled) {
+    background: linear-gradient(135deg, #c82333, #d81b60);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(220, 53, 69, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.project-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.project-name-input {
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.project-name-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.8);
+    background: white;
+}
+
+.project-name-input::placeholder {
+    color: #666;
+    font-weight: 400;
+}
+
+.project-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.project-id {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.project-embed-count {
+    font-weight: 500;
 }
 
 /* Main content */
@@ -231,47 +348,61 @@ body {
     border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
-/* Compact Square Slider styles */
+/* 3x3 Cube Grid Slider styles */
 .slider-container {
     position: relative;
     width: 100%;
-    max-width: 480px;
+    max-width: 600px;
     margin: 0 auto;
-    background: white;
-    border-radius: 16px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .slider-wrapper {
     position: relative;
     overflow: hidden;
-    background: #f8f9fa;
+    background: transparent;
+    padding: 20px;
 }
 
 .slider-track {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 16px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 12px;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.slider-track.paginating {
+    opacity: 0.7;
+    transform: scale(0.95);
 }
 
 .slider-slide {
     position: relative;
     aspect-ratio: 1;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.12),
+        0 4px 10px rgba(0, 0, 0, 0.08);
+    transform-style: preserve-3d;
+    background: #fff;
 }
 
 .slider-slide:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    z-index: 2;
+    transform: translateY(-8px) translateZ(10px) rotateX(5deg);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.2),
+        0 12px 20px rgba(0, 0, 0, 0.15);
+    z-index: 5;
 }
 
 .slider-slide img {
@@ -279,73 +410,156 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.3s ease;
+    transition: all 0.4s ease;
+    border-radius: 16px;
 }
 
 .slider-slide:hover img {
-    transform: scale(1.1);
+    transform: scale(1.08);
+    filter: brightness(1.1) contrast(1.05);
+}
+
+/* 3D Cube effect for individual slides */
+.slider-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(0, 0, 0, 0.1) 100%);
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.slider-slide:hover::before {
+    opacity: 1;
+}
+
+/* Grid pattern background */
+.slider-track::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(102, 126, 234, 0.03) 0%, transparent 25%),
+        radial-gradient(circle at 75% 75%, rgba(118, 75, 162, 0.03) 0%, transparent 25%);
+    pointer-events: none;
+    border-radius: 12px;
 }
 
 .slider-nav {
     position: absolute;
-    top: 8px;
-    background: rgba(0, 0, 0, 0.6);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    color: white;
-    transition: all 0.3s ease;
-    z-index: 10;
-    backdrop-filter: blur(8px);
+    font-size: 20px;
+    color: #667eea;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 15;
+    backdrop-filter: blur(12px);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .slider-nav:hover {
-    background: rgba(0, 0, 0, 0.8);
-    transform: scale(1.1);
+    background: linear-gradient(145deg, #667eea, #764ba2);
+    color: white;
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 
+        0 15px 35px rgba(102, 126, 234, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.slider-nav:active {
+    transform: translateY(-50%) scale(1.05);
 }
 
 .slider-nav.prev {
-    left: 8px;
+    left: -25px;
 }
 
 .slider-nav.next {
-    right: 8px;
+    right: -25px;
+}
+
+/* Hide nav buttons when only one page */
+.slider-nav.disabled {
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 .slider-indicators {
     position: absolute;
-    bottom: 12px;
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 6px;
+    gap: 10px;
     z-index: 10;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 8px 12px;
-    border-radius: 20px;
-    backdrop-filter: blur(8px);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    padding: 12px 20px;
+    border-radius: 30px;
+    backdrop-filter: blur(12px);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .slider-indicator {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
-    border: none;
+    background: rgba(102, 126, 234, 0.3);
+    border: 2px solid rgba(102, 126, 234, 0.2);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.slider-indicator:hover {
+    background: rgba(102, 126, 234, 0.6);
+    transform: scale(1.2);
 }
 
 .slider-indicator.active {
+    background: linear-gradient(145deg, #667eea, #764ba2);
+    border-color: #667eea;
+    transform: scale(1.3);
+    box-shadow: 
+        0 0 15px rgba(102, 126, 234, 0.5),
+        0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.slider-indicator.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
     background: white;
-    transform: scale(1.4);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
 }
 
 /* Controls */
