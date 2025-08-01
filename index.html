@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slider Embed Generator</title>
+    <link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Image Slider Generator</h1>
+            <p>Upload images and generate embeddable slider code for any website</p>
+        </header>
+
+        <main class="main">
+            <section class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7,10 12,15 17,10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <h3>Drop images here or click to upload</h3>
+                        <p>Support for JPG, PNG, GIF, and WebP formats</p>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept="image/*" class="file-input">
+                </div>
+                
+                <div class="uploaded-images" id="uploadedImages">
+                    <!-- Uploaded images will be displayed here -->
+                </div>
+            </section>
+
+            <section class="preview-section" id="previewSection" style="display: none;">
+                <h2>Preview</h2>
+                <div class="preview-container" id="previewContainer">
+                    <!-- Slider preview will be rendered here -->
+                </div>
+                
+                <div class="controls">
+                    <button id="regenerateBtn" class="btn btn-secondary">Regenerate Slider</button>
+                    <button id="generateCodeBtn" class="btn btn-primary">Generate Embed Code</button>
+                </div>
+            </section>
+
+            <section class="embed-section" id="embedSection" style="display: none;">
+                <h2>Embed Code</h2>
+                <div class="code-container">
+                    <textarea id="embedCode" readonly class="embed-textarea"></textarea>
+                    <button id="copyCodeBtn" class="btn btn-copy">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy Code
+                    </button>
+                </div>
+                <div class="embed-instructions">
+                    <h3>How to use:</h3>
+                    <ol>
+                        <li>Copy the embed code above</li>
+                        <li>Paste it into your website's HTML</li>
+                        <li>The slider will automatically render with your images</li>
+                    </ol>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/ImageUploadManager.js?v=3"></script>
+    <script src="js/SliderComponent.js?v=3"></script>
+    <script src="js/EmbedCodeGenerator.js?v=3"></script>
+    <script src="js/PreviewManager.js?v=3"></script>
+    <script src="js/AppController.js?v=3"></script>
+    <script src="js/main.js?v=3"></script>
+</body>
+</html> 

@@ -1,0 +1,38 @@
+{
+  "name": "image-slider-generator",
+  "version": "1.0.0",
+  "description": "A beautiful landing page for generating embeddable image sliders",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx live-server --port=3000 --open",
+    "dev": "npx live-server --port=3000 --open --watch=.",
+    "serve": "npx http-server -p 3000 -o",
+    "build": "echo 'Build completed - static files ready for deployment'",
+    "preview": "npx live-server --port=3000",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "image-slider",
+    "embed-generator",
+    "carousel",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/image-slider-generator"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/image-slider-generator/issues"
+  },
+  "homepage": "https://github.com/yourusername/image-slider-generator#readme"
+} 
