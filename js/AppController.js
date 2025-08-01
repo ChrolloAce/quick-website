@@ -37,6 +37,9 @@ window.AppController = class AppController {
         // Initialize image upload manager
         this.imageUploadManager = new ImageUploadManager();
         
+        // Initialize web image extractor
+        this.webImageExtractor = new WebImageExtractor();
+        
         // Initialize preview manager
         this.previewManager = new PreviewManager();
         
@@ -55,6 +58,23 @@ window.AppController = class AppController {
         this.imageUploadManager.on('imagesUpdated', (images) => {
             this.handleImagesUpdated(images);
         });
+
+        // Listen to web extraction events
+        this.webImageExtractor.on('extractionStarted', (data) => {
+            this.handleExtractionStarted(data);
+        });
+
+        this.webImageExtractor.on('extractionCompleted', (data) => {
+            this.handleExtractionCompleted(data);
+        });
+
+        this.webImageExtractor.on('extractionError', (data) => {
+            this.handleExtractionError(data);
+        });
+
+        this.webImageExtractor.on('processingProgress', (data) => {
+            this.handleProcessingProgress(data);
+        });
         
         // Listen to preview events
         document.addEventListener('previewSlideChanged', (event) => {
@@ -66,6 +86,28 @@ window.AppController = class AppController {
      * Bind UI events
      */
     bindEvents() {
+        // Method tabs
+        const methodTabs = document.querySelectorAll('.method-tab');
+        methodTabs.forEach(tab => {
+            tab.addEventListener('click', () => this.handleMethodTabClick(tab));
+        });
+
+        // Extract images button
+        const extractImagesBtn = document.getElementById('extractImagesBtn');
+        if (extractImagesBtn) {
+            extractImagesBtn.addEventListener('click', () => this.handleExtractImages());
+        }
+
+        // URL input enter key
+        const websiteUrl = document.getElementById('websiteUrl');
+        if (websiteUrl) {
+            websiteUrl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handleExtractImages();
+                }
+            });
+        }
+
         // Regenerate button
         const regenerateBtn = document.getElementById('regenerateBtn');
         if (regenerateBtn) {
@@ -359,6 +401,163 @@ window.AppController = class AppController {
     }
 
     /**
+     * Handle method tab clicks
+     */
+    handleMethodTabClick(clickedTab) {
+        const method = clickedTab.getAttribute('data-method');
+        
+        // Update tab states
+        document.querySelectorAll('.method-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        clickedTab.classList.add('active');
+        
+        // Update method visibility
+        document.querySelectorAll('.upload-method').forEach(methodDiv => {
+            methodDiv.classList.remove('active');
+        });
+        
+        const targetMethod = document.getElementById(method + 'Method');
+        if (targetMethod) {
+            targetMethod.classList.add('active');
+        }
+        
+        this.trackEvent('method_switched', { method });
+    }
+
+    /**
+     * Handle extract images from website
+     */
+    async handleExtractImages() {
+        const urlInput = document.getElementById('websiteUrl');
+        if (!urlInput || !urlInput.value.trim()) {
+            this.showError('Please enter a website URL');
+            return;
+        }
+
+        const url = urlInput.value.trim();
+        
+        try {
+            await this.webImageExtractor.extractImages(url);
+        } catch (error) {
+            // Error is handled by extraction event listeners
+        }
+    }
+
+    /**
+     * Handle extraction started
+     */
+    handleExtractionStarted(data) {
+        const progressDiv = document.getElementById('extractionProgress');
+        const extractBtn = document.getElementById('extractImagesBtn');
+        
+        if (progressDiv) {
+            progressDiv.style.display = 'block';
+            progressDiv.querySelector('.progress-text').textContent = 'Extracting images from website...';
+            progressDiv.querySelector('.progress-fill').style.width = '20%';
+        }
+        
+        if (extractBtn) {
+            extractBtn.disabled = true;
+            extractBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c.69 0 1.36.08 2 .22"></path>
+                </svg>
+                Extracting...
+            `;
+        }
+        
+        this.trackEvent('extraction_started', { url: data.url });
+    }
+
+    /**
+     * Handle extraction completed
+     */
+    handleExtractionCompleted(data) {
+        const progressDiv = document.getElementById('extractionProgress');
+        const extractBtn = document.getElementById('extractImagesBtn');
+        
+        if (progressDiv) {
+            progressDiv.querySelector('.progress-fill').style.width = '100%';
+            progressDiv.querySelector('.progress-text').textContent = `Extracted ${data.images.length} images successfully!`;
+            
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+            }, 2000);
+        }
+        
+        if (extractBtn) {
+            extractBtn.disabled = false;
+            extractBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                Extract Images
+            `;
+        }
+        
+        // Add extracted images to the upload manager
+        data.images.forEach(image => {
+            this.imageUploadManager.addImage(image);
+        });
+        
+        this.imageUploadManager.renderImages();
+        this.handleImagesUpdated(this.imageUploadManager.getImages());
+        
+        this.showSuccess(`Successfully extracted ${data.images.length} images from website!`);
+        this.trackEvent('extraction_completed', { 
+            url: data.url, 
+            imageCount: data.images.length 
+        });
+    }
+
+    /**
+     * Handle extraction error
+     */
+    handleExtractionError(data) {
+        const progressDiv = document.getElementById('extractionProgress');
+        const extractBtn = document.getElementById('extractImagesBtn');
+        
+        if (progressDiv) {
+            progressDiv.style.display = 'none';
+        }
+        
+        if (extractBtn) {
+            extractBtn.disabled = false;
+            extractBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                Extract Images
+            `;
+        }
+        
+        this.showError(`Failed to extract images: ${data.error}`);
+        this.trackEvent('extraction_error', { 
+            url: data.url, 
+            error: data.error 
+        });
+    }
+
+    /**
+     * Handle processing progress
+     */
+    handleProcessingProgress(data) {
+        const progressDiv = document.getElementById('extractionProgress');
+        
+        if (progressDiv) {
+            const progress = Math.round((data.current / data.total) * 60) + 20; // 20-80%
+            progressDiv.querySelector('.progress-fill').style.width = `${progress}%`;
+            progressDiv.querySelector('.progress-text').textContent = 
+                `Processing images... ${data.current}/${data.total}`;
+        }
+    }
+
+    /**
      * Clear all data and reset application
      */
     clearAll() {
@@ -368,6 +567,12 @@ window.AppController = class AppController {
             this.hideEmbedSection();
             this.currentImages = [];
             this.updateAppState('upload');
+            
+            // Reset URL input
+            const urlInput = document.getElementById('websiteUrl');
+            if (urlInput) {
+                urlInput.value = '';
+            }
             
             this.showSuccess('Application reset successfully');
             this.trackEvent('app_reset');

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slider Embed Generator</title>
-    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
     <div class="container">
@@ -15,17 +15,73 @@
 
         <main class="main">
             <section class="upload-section">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-content">
-                        <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7,10 12,15 17,10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        <h3>Drop images here or click to upload</h3>
-                        <p>Support for JPG, PNG, GIF, and WebP formats</p>
+                <div class="upload-methods">
+                    <div class="method-tabs">
+                        <button class="method-tab active" data-method="upload">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Upload Files
+                        </button>
+                        <button class="method-tab" data-method="website">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M2 12h20"></path>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            Extract from Website
+                        </button>
                     </div>
-                    <input type="file" id="fileInput" multiple accept="image/*" class="file-input">
+                </div>
+
+                <!-- Upload Method -->
+                <div class="upload-method active" id="uploadMethod">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <h3>Drop images here or click to upload</h3>
+                            <p>Support for JPG, PNG, GIF, and WebP formats</p>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept="image/*" class="file-input">
+                    </div>
+                </div>
+
+                <!-- Website Method -->
+                <div class="upload-method" id="websiteMethod">
+                    <div class="website-input-area">
+                        <div class="website-input-content">
+                            <svg class="website-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M2 12h20"></path>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                            </svg>
+                            <h3>Extract images from any website</h3>
+                            <p>Enter a website URL to automatically extract all images</p>
+                        </div>
+                        <div class="url-input-container">
+                            <input type="url" id="websiteUrl" placeholder="https://example.com" class="url-input">
+                            <button id="extractImagesBtn" class="btn btn-primary extract-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
+                                Extract Images
+                            </button>
+                        </div>
+                        <div class="extraction-progress" id="extractionProgress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <p class="progress-text">Extracting images...</p>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="uploaded-images" id="uploadedImages">
@@ -69,11 +125,12 @@
         </main>
     </div>
 
-    <script src="js/ImageUploadManager.js?v=3"></script>
-    <script src="js/SliderComponent.js?v=3"></script>
-    <script src="js/EmbedCodeGenerator.js?v=3"></script>
-    <script src="js/PreviewManager.js?v=3"></script>
-    <script src="js/AppController.js?v=3"></script>
-    <script src="js/main.js?v=3"></script>
+    <script src="js/ImageUploadManager.js?v=4"></script>
+    <script src="js/SliderComponent.js?v=4"></script>
+    <script src="js/EmbedCodeGenerator.js?v=4"></script>
+    <script src="js/WebImageExtractor.js?v=4"></script>
+    <script src="js/PreviewManager.js?v=4"></script>
+    <script src="js/AppController.js?v=4"></script>
+    <script src="js/main.js?v=4"></script>
 </body>
 </html> 
